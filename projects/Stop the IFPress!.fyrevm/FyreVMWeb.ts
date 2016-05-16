@@ -3,7 +3,7 @@
 
     Main Module to run FyreVM web engine (glulx-typescript).
 
-    Exposes onReady event for web page to get data.
+    Exposes OutputReady event for web page to get data.
     Exposes sendCommand function for web pages to execute command.
 
 */
@@ -54,9 +54,11 @@ module FyreVMWeb {
             var reader = new XMLHttpRequest();
             reader.open('GET', url);
             reader.responseType = 'arraybuffer';
-            if (reader.readyState === XMLHttpRequest.DONE) {
-                this.wrapper = FyreVM.EngineWrapper.loadFromArrayBuffer(reader.response, true);
-                setTimeout( () => this.ProcessCommand(this.wrapper.run()), 0);
+            reader.onreadystatechange = () => {
+                if (reader.readyState === XMLHttpRequest.DONE) {
+                    this.wrapper = FyreVM.EngineWrapper.loadFromArrayBuffer(reader.response, true);
+                    this.ProcessCommand(this.wrapper.run());
+                }
             }
             reader.send()
         }
